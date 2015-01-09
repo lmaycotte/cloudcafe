@@ -75,4 +75,4 @@ class PortsConfig(NetworkingBaseConfig):
     @property
     def resource_get_timeout(self):
         """Seconds to wait for getting a resource"""
-        return int(self.get("resource_get_timeout", 15))
+        return int(self.get("resource_get_timeout", 60))
