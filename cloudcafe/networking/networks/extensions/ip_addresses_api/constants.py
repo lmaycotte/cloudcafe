@@ -35,7 +35,7 @@ class IPAddressesResponseCodes(NeutronResponseCodes):
     GET_IP_ADDRESS = 200
 
     # Using HTTP 200 instead of 201 till NCP-1577 is fixed
-    CREATE_IP_ADDRESS = 200
+    CREATE_IP_ADDRESS = 201
     UPDATE_IP_ADDRESS = 200
     DELETE_IP_ADDRESS = 204
 
@@ -52,6 +52,7 @@ class IPAddressesServerZone(object):
     server builds
     """
 
+    RAX_PUBLIC_IP_ZONE = 'RAX-PUBLIC-IP-ZONE-ID:publicIPZoneId'
     PUBLIC_IP_ZONE_NEAR = 'public_ip_zone:near'
     PUBLIC_IP_ZONE_FAR = 'public_ip_zone:far'
     DIFFERENT_HOST = 'different_host'
