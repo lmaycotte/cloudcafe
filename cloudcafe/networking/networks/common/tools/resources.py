@@ -48,6 +48,12 @@ class Resources(object):
 
     The class attributes are set after the set_resources call.
     """
+
+    # Key names for resources composite behaviors object and get/delete methods
+    RES_COM = 'res_com'
+    GET_FN = 'get_fn'
+    DEL_FN = 'del_fn'
+
     def __init__(self):
         self.resources = None
 
@@ -153,18 +159,18 @@ class Resources(object):
 
         # Defining resources get calls.
         res_fn = collections.OrderedDict([
-            ('servers', {'res_com': com.net.behaviors,
-                         'get_fn': 'list_servers'}),
-            ('keypairs', {'res_com': com.net.behaviors,
-                          'get_fn': 'list_keypairs'}),
-            ('security_groups', {'res_com': com.sec.behaviors,
-                                 'get_fn': 'list_security_groups'}),
-            ('ports', {'res_com': com.ports.behaviors,
-                       'get_fn': 'list_ports'}),
-            ('subnets', {'res_com': com.subnets.behaviors,
-                         'get_fn': 'list_subnets'}),
-            ('networks', {'res_com': com.networks.behaviors,
-                          'get_fn': 'list_networks'})
+            ('servers', {self.RES_COM: com.net.behaviors,
+                         self.GET_FN: 'list_servers'}),
+            ('keypairs', {self.RES_COM: com.net.behaviors,
+                          self.GET_FN: 'list_keypairs'}),
+            ('security_groups', {self.RES_COM: com.sec.behaviors,
+                                 self.GET_FN: 'list_security_groups'}),
+            ('ports', {self.RES_COM: com.ports.behaviors,
+                       self.GET_FN: 'list_ports'}),
+            ('subnets', {self.RES_COM: com.subnets.behaviors,
+                         self.GET_FN: 'list_subnets'}),
+            ('networks', {self.RES_COM: com.networks.behaviors,
+                          self.GET_FN: 'list_networks'})
             ])
 
         resources = res_fn.keys()
@@ -179,10 +185,10 @@ class Resources(object):
 
         output_list = []
         for resource in resources:
-            output = PrettyTable()
+            resource_table = PrettyTable()
             count = dict()
-            res_com = res_fn[resource]['res_com']
-            get_fn = res_fn[resource]['get_fn']
+            res_com = res_fn[resource][self.RES_COM]
+            get_fn = res_fn[resource][self.GET_FN]
             params_kwargs = dict(raise_exception=raise_exception)
 
             resp = getattr(res_com, get_fn)(**params_kwargs)
@@ -195,7 +201,7 @@ class Resources(object):
             name_list = res_com.get_name_list_from_entity_list(
                 entity_list=resp, name=name)
             resource_name = '{0}_name'.format(resource)
-            output.add_column(resource_name, name_list)
+            resource_table.add_column(resource_name, name_list)
             names_count = len(name_list)
             count.update({'names': names_count})
 
@@ -204,20 +210,20 @@ class Resources(object):
                 id_list = res_com.get_id_list_from_entity_list(
                     entity_list=resp, name=name)
                 resource_id = '{0}_id'.format(resource)
-                output.add_column(resource_id, id_list)
+                resource_table.add_column(resource_id, id_list)
             else:
                 id_list = []
             ids_count = len(id_list)
             count.update({'ids': ids_count})
 
-            output.align = 'l'
+            resource_table.align = 'l'
 
-            output_list.append(output)
-            count.update({'table': output})
+            output_list.append(resource_table)
+            count.update({'table': resource_table})
             resources_count.update({resource: count})
 
             if verbose:
-                print output
+                print resource_table
 
         if verbose:
             print 'Resources Summary'
@@ -246,7 +252,7 @@ class Resources(object):
                 'security_group_rules': 'test*', 'security_groups': 'test*',
                 'ports': 'ports*', 'subnets': 'test*', 'networks': 'test*'}
 
-                The values heere are just name pattern examples and should be
+                The values here are just name pattern examples and should be
                 set to '*' for all or may have a resource start name like
                 'test*', that will delete all resources starting with test
                 on their name. You can also give a resource exact name, or
@@ -286,18 +292,18 @@ class Resources(object):
 
         # Defining resources delete calls. Delete order is important.
         res_fn = collections.OrderedDict([
-            ('servers', {'res_com': com.net.behaviors,
-                         'del_fn': 'wait_for_servers_to_be_deleted'}),
-            ('keypairs', {'res_com': com.net.behaviors,
-                          'del_fn': 'delete_keypairs'}),
-            ('security_groups', {'res_com': com.sec.behaviors,
-                                 'del_fn': 'delete_security_groups'}),
-            ('ports', {'res_com': com.ports.behaviors,
-                       'del_fn': 'delete_ports'}),
-            ('subnets', {'res_com': com.subnets.behaviors,
-                         'del_fn': 'delete_subnets'}),
-            ('networks', {'res_com': com.networks.behaviors,
-                          'del_fn': 'delete_networks'})
+            ('servers', {self.RES_COM: com.net.behaviors,
+                         self.DEL_FN: 'wait_for_servers_to_be_deleted'}),
+            ('keypairs', {self.RES_COM: com.net.behaviors,
+                          self.DEL_FN: 'delete_keypairs'}),
+            ('security_groups', {self.RES_COM: com.sec.behaviors,
+                                 self.DEL_FN: 'delete_security_groups'}),
+            ('ports', {self.RES_COM: com.ports.behaviors,
+                       self.DEL_FN: 'delete_ports'}),
+            ('subnets', {self.RES_COM: com.subnets.behaviors,
+                         self.DEL_FN: 'delete_subnets'}),
+            ('networks', {self.RES_COM: com.networks.behaviors,
+                          self.DEL_FN: 'delete_networks'})
             ])
 
         resources = res_fn.keys()
@@ -331,8 +337,8 @@ class Resources(object):
                         msg = '\n'.join([msg, add_msg])
                     print msg
 
-                res_com = res_fn[resource]['res_com']
-                del_fn = res_fn[resource]['del_fn']
+                res_com = res_fn[resource][self.RES_COM]
+                del_fn = res_fn[resource][self.DEL_FN]
                 params_kwargs = dict(name=name_pattern)
 
                 if resource == 'servers':

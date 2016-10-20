@@ -361,6 +361,21 @@ class NetworkingBehaviors(NetworkingBaseBehaviors):
             resp.entity.admin_pass = server.admin_pass
         return resp.entity
 
+    def get_remote_instance_client(self, server, ip_address, private_key,
+                                   ssh_username='root', auth_strategy='key'):
+        """
+        @summary: gets a compute server remote client
+        """
+
+        if self.compute is None:
+            raise UnavailableComputeInteractionException
+
+        remote_client = (
+            self.compute.servers.behaviors.get_remote_instance_client(
+                server=server, ip_address=ip_address, username=ssh_username,
+                key=private_key, auth_strategy=auth_strategy))
+        return remote_client
+
     def list_servers(self, name=None, raise_exception=False):
         """
         @summary: list servers wrapper for networks
@@ -577,10 +592,14 @@ class NetworkingBehaviors(NetworkingBaseBehaviors):
         @summary: Waits for multiple servers to be deleted
         @param server_id_list: The uuids of the servers to be deleted
         @type server_id_list: List
+        @param name: name or name_starts_with* to filter by
+        @type name: str
         @param interval_time: Seconds to wait between polling
         @type interval_time: Integer
         @param timeout: The amount of time in seconds to wait before aborting
         @type timeout: Integer
+        @param raise_exception: flag to raise an exception if delete fails
+        @type raise_exception: bool
         """
 
         if self.compute is None:
@@ -589,12 +608,12 @@ class NetworkingBehaviors(NetworkingBaseBehaviors):
         if not server_id_list:
             if not name:
                 raise MissingDataException('Missing name pattern')
-            server_ids = self.list_server_ids(name=name)
-            log_msg = 'Deleting servers: {0}'.format(server_ids)
+            server_id_list = self.list_server_ids(name=name)
+            log_msg = 'Deleting servers: {0}'.format(server_id_list)
             self._log.info(log_msg)
 
         failed_deletes = self._wait_for_compute_delete(
-            resource_id_list=server_ids, resource='servers',
+            resource_id_list=server_id_list, resource='servers',
             delete_method=self.compute.servers.client.delete_server,
             get_method=self.compute.servers.client.get_server,
             interval_time=interval_time, timeout=timeout,
