@@ -140,9 +140,9 @@ class SecurityGroupsBehaviors(NetworkingBaseBehaviors):
             for rule in rules:
                 result = dict(security_group_id=sg_id,
                               security_group_rule_id=rule.id)
-                if (all_rules or rule.ethertype == ethertype or
+                if (all_rules or rule.ethertype.lower() == ethertype.lower() or
                         rule.protocol.lower() == protocol.lower() or
-                        rule.direction == direction):
+                        rule.direction.lower() == direction.lower()):
                     delete = self.delete_security_group_rule(
                         security_group_rule_id=rule.id, raise_exception=True)
                     result.update(delete_request=delete)

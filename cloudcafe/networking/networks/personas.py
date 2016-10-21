@@ -79,6 +79,10 @@ class ServerPersona(BaseModel, NetworkingBaseBehaviors):
         @type pnet_fix_ipv4_count: int
         @param pnet_fix_ipv6_count: expected public network fixed IPv6s count
         @type pnet_fix_ipv6_count: int
+        @param keypair: keypair object with private_key attribute
+        @type keypair: networking.networks.behaviors create_keypair response
+        @param ssh_username: remote client username for SSH
+        @type ssh_username: str
         """
 
         # Server and keypair entity object
