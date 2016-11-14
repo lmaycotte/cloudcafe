@@ -382,8 +382,6 @@ class ServerPersona(BaseModel, NetworkingBaseBehaviors):
         else:
             port_ids = persona_port_ids
 
-        print port_ids
-
         # Adding the security group
         for port_id in port_ids:
             update = self.ports.behaviors.update_port(

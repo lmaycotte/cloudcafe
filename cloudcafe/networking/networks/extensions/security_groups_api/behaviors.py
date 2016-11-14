@@ -62,7 +62,7 @@ class SecurityGroupsBehaviors(NetworkingBaseBehaviors):
         # Verifying an expected protocol is given
         expected_protocols = [self.ICMP, self.TCP, self.UDP]
         if protocol not in expected_protocols:
-            msg = '[0] not within the expected protocols: {1}'.format(
+            msg = '{0} not within the expected protocols: {1}'.format(
                 protocol, expected_protocols)
             raise MissingDataException(msg)
 
@@ -71,7 +71,7 @@ class SecurityGroupsBehaviors(NetworkingBaseBehaviors):
         attrs_kwargs = dict(protocol=protocol, ethertype=ethertype)
 
         # Verifying a port or port range is given for tcp and udp rules
-        if protocol == self.TCP or protocol == self.UDP:
+        if protocol in [self.TCP, self.UDP]:
             if not ports:
                 msg = ('{0} protocol requires the ports value, for ex.'
                        '22 or 442-445').format(protocol)
@@ -112,8 +112,8 @@ class SecurityGroupsBehaviors(NetworkingBaseBehaviors):
 
         return results
 
-    def remove_rule(self, security_groups, version=None, protocol=None,
-                    direction=None, all_rules=False):
+    def remove_rule(self, security_groups, version=None, protocol='',
+                    direction='', all_rules=False):
         """
         @summary: remove rules from groups based on criteria
         @param security_groups: security groups to remove the rules.
@@ -128,7 +128,10 @@ class SecurityGroupsBehaviors(NetworkingBaseBehaviors):
         @type all_rules: bool
         """
 
-        ethertype = 'IPv{0}'.format(version)
+        if version:
+            ethertype = 'IPv{0}'.format(version)
+        else:
+            ethertype = 'DoNotDeleteByIP'
 
         results = []
 
